@@ -176,3 +176,5 @@ This project is licensed under the strict **GNU GPLv3 License**.
 *   **Commercial Use**: Commercial exploitation, closed-source integration, or proprietary redistribution of this framework is strictly prohibited without explicit dual-licensing permission from the original authors.
 
 See the full [LICENSE](LICENSE) file for exact legal details.
+   
+ 
