@@ -1,0 +1,20 @@
+# Ignore build output
+bin/
+*.exe
+*.obj
+*.o
+
+# Ignore data directories and result folders to avoid uploading huge logs
+data/
+results/
+stego_outputs/
+*.log
+*.csv
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# VSCode or other editor config
+.vscode/
+.idea/
