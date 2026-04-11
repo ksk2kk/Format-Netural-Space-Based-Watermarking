@@ -9,14 +9,21 @@
 #include <set>
 #include <limits>
 #include <cmath>
+#ifdef _WIN32
 #define NOMINMAX
 #include <windows.h>
+#else
+#include <sys/resource.h>
+#include <sys/time.h>
+#include <unistd.h>
+#endif
 #include <sstream>
 
 using namespace std;
 
 // 辅助函数：获取当前进程的 CPU 时间（内核+用户），单位：100ns
 unsigned long long getProcessCPUTime() {
+#ifdef _WIN32
     FILETIME createTime, exitTime, kernelTime, userTime;
     if (GetProcessTimes(GetCurrentProcess(), &createTime, &exitTime, &kernelTime, &userTime)) {
         ULARGE_INTEGER liKernel, liUser;
@@ -27,10 +34,20 @@ unsigned long long getProcessCPUTime() {
         return liKernel.QuadPart + liUser.QuadPart;
     }
     return 0;
+#else
+    struct rusage usage;
+    if (getrusage(RUSAGE_SELF, &usage) == 0) {
+        unsigned long long userTime = usage.ru_utime.tv_sec * 10000000ULL + usage.ru_utime.tv_usec * 10ULL;
+        unsigned long long kernelTime = usage.ru_stime.tv_sec * 10000000ULL + usage.ru_stime.tv_usec * 10ULL;
+        return userTime + kernelTime;
+    }
+    return 0;
+#endif
 }
 
 // 辅助函数：绿色字体输出
 void printGreen(const string& text) {
+#ifdef _WIN32
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     // 保存当前属性
     CONSOLE_SCREEN_BUFFER_INFO consoleInfo;
@@ -43,6 +60,9 @@ void printGreen(const string& text) {
 
     // 恢复
     SetConsoleTextAttribute(hConsole, originalAttrs);
+#else
+    cout << "\033[1;32m" << text << "\033[0m" << endl;
+#endif
 }
 
 
@@ -528,9 +548,13 @@ void doStreamHide() {
     int sampleCount = 0;
 
     // 获取系统核心数
+#ifdef _WIN32
     SYSTEM_INFO sysInfo;
     GetSystemInfo(&sysInfo);
     int numProcessors = sysInfo.dwNumberOfProcessors;
+#else
+    int numProcessors = sysconf(_SC_NPROCESSORS_ONLN);
+#endif
     if (numProcessors < 1) numProcessors = 1;
     
     // 延迟变量
@@ -1049,15 +1073,18 @@ void doZWCComparison() {
 
 #include "compare_module.cpp"
 
-int main() {
+int main(int argc, char* argv[]) {
+#ifdef _WIN32
     system("chcp 65001 > nul");
+#endif
     {
-        int argc = 0;
-        LPWSTR* argvW = CommandLineToArgvW(GetCommandLineW(), &argc);
-        if (argvW && argc > 1) {
-            vector<string> args;
-            args.reserve(argc);
-            for (int i = 0; i < argc; i++) {
+        vector<string> args;
+#ifdef _WIN32
+        int wargc = 0;
+        LPWSTR* argvW = CommandLineToArgvW(GetCommandLineW(), &wargc);
+        if (argvW && wargc > 1) {
+            args.reserve(wargc);
+            for (int i = 0; i < wargc; i++) {
                 wstring ws(argvW[i]);
                 int len = WideCharToMultiByte(CP_UTF8, 0, ws.c_str(), (int)ws.size(), nullptr, 0, nullptr, nullptr);
                 string s(len, '\0');
@@ -1065,7 +1092,17 @@ int main() {
                 args.push_back(s);
             }
             LocalFree(argvW);
+        }
+#else
+        if (argc > 1) {
+            args.reserve(argc);
+            for (int i = 0; i < argc; i++) {
+                args.push_back(argv[i]);
+            }
+        }
+#endif
 
+        if (!args.empty() && args.size() > 1) {
             int option = -1;
             string file;
             string secret;
@@ -1097,8 +1134,6 @@ int main() {
                 doGlobalComparisonWithArgs(file, secret, debug, iterations, outdir);
                 return 0;
             }
-        } else if (argvW) {
-            LocalFree(argvW);
         }
     }
     
