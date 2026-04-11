@@ -1,5 +1,6 @@
 # Use an official C++ runtime as a parent image
-FROM ubuntu:22.04
+# Using a specific mirror to avoid timeout issues in some regions
+FROM docker.m.daocloud.io/ubuntu:22.04
 
 # Install build dependencies
 RUN apt-get update && \
