@@ -134,18 +134,7 @@ Register it in the run_academic_benchmark pipeline at the bottom of the file:
 run_academic_benchmark("Category Name", "Your Algorithm Name", embed_custom, extract_custom, max_capacity_custom);
 The framework will automatically calculate KL Divergence, Markov Shifts, Entropy, Robustness, and run it against all 6 steganalysis scanners.
 ```
-📝 Citation
-If you use this framework in your academic research, please cite our paper:
-```
 
-@article{LogStego2026,
-  title={Evaluating Log-based Steganography: A Comprehensive Benchmark Framework},
-  author={[Your Name / Authors]},
-  journal={[Target Journal / Conference]},
-  year={2026},
-  publisher={[Publisher]}
-}
-```
 ⚖️ License & Usage Restrictions
 STRICT LICENSE WARNING: GNU General Public License v3.0 (GPL-3.0)
 
