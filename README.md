@@ -24,28 +24,28 @@ This framework is built for reproducibility, enabling researchers to seamlessly 
 
 The benchmark categorizes text steganography into four primary domains, evaluating 11 distinct, academically verified channel models.
 
-### 1. Format-based Steganography (格式化隐写)
+### 1. Format-based Steganography
 
-* **Whitespace Modulation (空格歧义编码) [Proposed Novel Method]:** Leverages naturally occurring space runs in structured log files. It models the distribution of double/triple spaces as a covert channel, making it extremely resistant to LM-based detection.
-* **Zero-Width Characters (不可见字符嵌入):** Utilizes Unicode ZWJ (U+200D), ZWNJ (U+200C), and ZWNBSP (U+FEFF) to invisibly encode binary payloads between visible characters.
-* **Font-based / Homoglyph Manipulation (字体特征微调):** An academic channel model mapping Latin ASCII characters to visually identical Cyrillic/Greek homoglyphs (e.g., ASCII `a` vs. Cyrillic `a`).
+* **Whitespace Modulation [Proposed Novel Method]:** Leverages naturally occurring space runs in structured log files. It models the distribution of double/triple spaces as a covert channel, making it extremely resistant to LM-based detection.
+* **Zero-Width Characters:** Utilizes Unicode ZWJ (U+200D), ZWNJ (U+200C), and ZWNBSP (U+FEFF) to invisibly encode binary payloads between visible characters.
+* **Font-based / Homoglyph Manipulation:** An academic channel model mapping Latin ASCII characters to visually identical Cyrillic/Greek homoglyphs (e.g., ASCII `a` vs. Cyrillic `a`).
 
-### 2. Linguistic Steganography (语言学隐写)
+### 2. Linguistic Steganography
 
-* **Synonym Substitution (同义词替换):** Replaces target words with synonyms using parity-based splitting (e.g., odd-parity synonyms encode `1`, even-parity encode `0`).
-* **Syntactic Transformation (句法转换):** Alters the grammatical structure of sentences (e.g., converting active voice to passive voice) to encode data streams.
-* **Abbreviation & Spelling (拼写与缩写变体):** Exploits regional spelling differences (e.g., "color" vs "colour") or abbreviation expansions (e.g., "ASAP" vs "as soon as possible").
+* **Synonym Substitution:** Replaces target words with synonyms using parity-based splitting (e.g., odd-parity synonyms encode `1`, even-parity encode `0`).
+* **Syntactic Transformation:** Alters the grammatical structure of sentences (e.g., converting active voice to passive voice) to encode data streams.
+* **Abbreviation & Spelling:** Exploits regional spelling differences (e.g., "color" vs "colour") or abbreviation expansions (e.g., "ASAP" vs "as soon as possible").
 
-### 3. Generative Steganography (生成式隐写)
+### 3. Generative Steganography
 
-* **Markov Chain Generation (马尔可夫链生成):** Generates text using N-gram probability splits (median/quartile probability routing) to encode bits during the generation process.
-* **LLM-based Encoding (神经概率分布编码):** Simulates Large Language Model (LLM) token probability distributions, utilizing arithmetic coding or Huffman tree routing over the softmax output to hide data.
+* **Markov Chain Generation:** Generates text using N-gram probability splits (median/quartile probability routing) to encode bits during the generation process.
+* **LLM-based Encoding:** Simulates Large Language Model (LLM) token probability distributions, utilizing arithmetic coding or Huffman tree routing over the softmax output to hide data.
 
-### 4. Structural & Protocol-based Steganography (结构化与协议隐写)
+### 4. Structural & Protocol-based Steganography
 
-* **Padding (协议补白):** Appends specific byte paddings (e.g., trailing spaces, null bytes) structurally at the end of lines or blocks.
-* **Layout / Acrostic (特定布局编码):** Encodes bits in the first letters of lines (Acrostic) or in specific layout positions within a document grid.
-* **Field Ordering (字段顺序扰动):** Uses AST-like Key-Value pair reordering (e.g., swapping JSON/Log fields) to encode mathematical permutations (Factorial encoding).
+* **Padding:** Appends specific byte paddings (e.g., trailing spaces, null bytes) structurally at the end of lines or blocks.
+* **Layout / Acrostic:** Encodes bits in the first letters of lines (Acrostic) or in specific layout positions within a document grid.
+* **Field Ordering:** Uses AST-like Key-Value pair reordering (e.g., swapping JSON/Log fields) to encode mathematical permutations (Factorial encoding).
 
 ---
 
