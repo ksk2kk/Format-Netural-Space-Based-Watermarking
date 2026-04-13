@@ -19,7 +19,7 @@
 
 using namespace std;
 
-// === 真实算法模拟所需的核心组件 ===
+// === Core components required for realistic algorithm simulation ===
 
 inline string ascii_lower(string s) {
     for (char& c : s) c = (char)tolower((unsigned char)c);
@@ -124,7 +124,7 @@ inline string csv_escape(string s) {
     return out;
 }
 
-// 将 vector<char> 与 string 互转
+// Convert vector<char> to string and vice versa
 inline string vec2str(const vector<char>& v) {
     return string(v.begin(), v.end());
 }
@@ -132,7 +132,7 @@ inline vector<char> str2vec(const string& s) {
     return vector<char>(s.begin(), s.end());
 }
 
-// 统计单词数
+// Count word count
 inline int count_words(const string& s) {
     int count = 0;
     bool in_word = false;
@@ -147,7 +147,7 @@ inline int count_words(const string& s) {
     return max(count, 1);
 }
 
-// 模拟 LLM 推理的真实计算开销 (矩阵乘法)
+// Simulate the real computational cost of LLM inference (matrix multiplication)
 inline void simulate_llm_layer() {
     const int N = 128;
     static float A[N][N], B[N][N], C[N][N];
@@ -165,13 +165,13 @@ inline void simulate_llm_layer() {
     }
 }
 
-// 真实环境攻击模拟：分为三个等级
-// L1: 无损转换 (几乎无影响，这里略过复杂实现，返回原串)
+// Real environment attack simulation: divided into three levels
+// L1: Lossless conversion (almost no impact, skip the complex implementation here and return the original string)
 inline string apply_l1_attack(const string& text) {
     return text;
 }
 
-// L2: 常见噪声处理 (去除多余空格、不可见字符、富文本标签、大小写转换)
+// L2: Common noise processing (removal of extra spaces, invisible characters, rich text labels, case conversion)
 inline string apply_l2_attack(const string& text) {
     string res;
     bool in_space = false;
@@ -179,7 +179,7 @@ inline string apply_l2_attack(const string& text) {
     for (size_t i = 0; i < text.length(); ++i) {
         unsigned char c = text[i];
         
-        // 攻击 1: 移除不可见字符 (ZWC: E2 80 8B / 8C)
+        // Attack 1: Remove invisible characters (ZWC: E2 80 8B / 8C)
         if (c == 0xE2 && i + 2 < text.length() && (unsigned char)text[i+1] == 0x80) {
             unsigned char c3 = text[i+2];
             if (c3 == 0x8B || c3 == 0x8C || c3 == 0x8D) {
@@ -188,7 +188,7 @@ inline string apply_l2_attack(const string& text) {
             }
         }
         
-        // 攻击 2: 移除 HTML/XML 富文本标签 (Font)
+        // Attack 2: Remove HTML/XML rich text tags (Font)
         if (c == '<') { in_tag = true; continue; }
         if (c == '>') { in_tag = false; continue; }
         if (in_tag) continue;
@@ -211,27 +211,27 @@ inline string apply_l2_attack(const string& text) {
             }
         }
 
-        // 攻击 3: 格式转换与多余空格清洗
+        // Attack 3: Format conversion and redundant space cleaning
         if (c == ' ' || c == '\t' || c == '\r') {
             if (!in_space) {
                 res += ' ';
                 in_space = true;
             }
         } else if (c == '\n') {
-            if (!res.empty() && res.back() == ' ') res.pop_back(); // 去除行末空格
+            if (!res.empty() && res.back() == ' ') res.pop_back(); // Remove spaces at the end of lines
             res += '\n';
             in_space = false;
         } else {
-            res += tolower(c); // L2 攻击破坏大小写布局
+            res += tolower(c); // L2 attack breaks case layout
             in_space = false;
         }
     }
     return res;
 }
 
-// L3: 语义改写 (针对语言学隐写，同义词替换/缩写恢复)
+// L3: Semantic rewriting (for linguistic steganography, synonym replacement/abbreviation recovery)
 inline string apply_l3_attack(const string& text) {
-    string res = apply_l2_attack(text); // L3 包含 L2
+    string res = apply_l2_attack(text); // L3 contains L2
     static const vector<pair<string, string>> syn_pairs = {
         {"error", "fault"},
         {"info", "detail"},
@@ -436,10 +436,10 @@ inline DetectReport detect_all(const string& orig, const string& stego) {
     return r;
 }
 
-// ================= 各隐写方案的真实编解码实现 =================
+// ================= Real encoding and decoding implementation of each steganography scheme =================
 
-// 1.1 空格歧义编码 (Whitespace)
-// 计算最大理论容量：所有可作为槽位的空格数量
+// 1.1 Whitespace ambiguity encoding (Whitespace)
+// Calculate the maximum theoretical capacity: the number of spaces available as slots
 inline int max_capacity_ws(const string& s) {
     int slots = 0;
     for (char c : s) if (c == ' ') slots++;
@@ -1275,19 +1275,19 @@ inline vector<int> extract_field(string s, int target) {
 
 void doGlobalComparisonWithArgs(string origFile, string secretMsg, bool debugMode, int iterations, string outDir) {
     cout << "\n=========================================================================================" << endl;
-    cout << "=== 全球已知隐写方案综合基准测试 (Academic Benchmark: Reproducible & Rigorous) ===" << endl;
+    cout << "=== Comprehensive benchmark test of known steganography schemes around the world (Academic Benchmark: Reproducible & Rigorous) ===" << endl;
     cout << "=========================================================================================" << endl;
-    if (debugMode) cout << "[Debug] Debug 模式已开启。" << endl;
+    if (debugMode) cout << "[Debug] Debug mode is on." << endl;
     if (origFile.empty()) origFile = "log.txt";
     if (secretMsg.empty()) secretMsg = "Hidewriteforlog";
     if (outDir.empty()) outDir = "benchmark_outputs";
 
-    cout << "正在初始化内存实验环境并加载 [" << origFile << "]..." << endl;
+    cout << "Initializing the memory experimental environment and loading [" << origFile << "]..." << endl;
 
     vector<char> origContent;
     ifstream file(origFile, ios::binary);
     if (!file) {
-        cout << "错误：无法读取原始日志文件 [" << origFile << "]。请确保该文件存在。" << endl;
+        cout << "Error: Unable to read raw log file [" << origFile << "]. Please make sure the file exists." << endl;
         return;
     }
     file.seekg(0, ios::end);
@@ -1295,7 +1295,7 @@ void doGlobalComparisonWithArgs(string origFile, string secretMsg, bool debugMod
     file.seekg(0, ios::beg);
     origContent.resize(size);
     if (!file.read(origContent.data(), size)) {
-        cout << "文件读取失败！" << endl;
+        cout << "File reading failed!" << endl;
         return;
     }
     
@@ -1336,10 +1336,10 @@ void doGlobalComparisonWithArgs(string origFile, string secretMsg, bool debugMod
     double origSizeKB = origContent.size() / 1024.0;
     int wordCount = count_words(origStr);
 
-    cout << "构建统一测试数据集完成: " << origSizeKB << " KB, 约 " << wordCount << " 个词/标记。" << endl;
+    cout << "Construction of a unified test data set is completed:" << origSizeKB << "KB, approx." << wordCount << "words/tags." << endl;
     build_markov_model_for_corpus(origStr);
 
-    cout << "准备执行 11 种方案的科学编码/解码测试 (注入 256-bit 秘密信息，固定种子可复现)..." << endl;
+    cout << "Prepare to perform scientific encoding/decoding tests of 11 scenarios (inject 256-bit secret information, fixed seed to reproduce)..." << endl;
     cout << "-----------------------------------------------------------------------------------------" << endl;
 
     const int ITERATIONS = max(1, iterations);
@@ -1360,8 +1360,8 @@ void doGlobalComparisonWithArgs(string origFile, string secretMsg, bool debugMod
             << "secret,orig_file,iteration,is_fixed_secret,category,scheme,embedded,time_ms_kb,byte_kl,token_kl,token_bigram_kl,markov_shift,entropy_diff,rob_l2,rob_l3,zwc_count,markup_count,homoglyph_count,ws_double_space_ratio,ws_max_space_run,ws_trailing_space_lines,lm_ce,lm_ce_delta,det_zwc,det_markup,det_homoglyph,det_trailing,det_ws_stats,det_lm\n";
     }
 
-    // 【学术修正 2】深度统计隐蔽性分析
-    // 1. KL散度计算 (信息熵测试)
+    // 【Academic Correction 2】Deep Statistical Hidden Analysis
+    // 1. KL divergence calculation (information entropy test)
     auto calcKL = [&](const vector<char>& P, const vector<char>& Q) -> double {
         vector<long long> freqP(256, 0), freqQ(256, 0);
         for(char c: P) freqP[(unsigned char)c]++;
@@ -1381,7 +1381,7 @@ void doGlobalComparisonWithArgs(string origFile, string secretMsg, bool debugMod
         return abs(kl); 
     };
 
-    // 2. 二阶马尔可夫转移偏移 (针对空格连续性的特征提取)
+    // 2. Second-order Markov transfer offset (feature extraction for space continuity)
     auto calcMarkovShift = [&](const string& orig, const string& stego) -> double {
         auto getTransitions = [](const string& s) {
             map<string, int> trans;
@@ -1401,7 +1401,7 @@ void doGlobalComparisonWithArgs(string origFile, string secretMsg, bool debugMod
         return shift;
     };
 
-    // 3. 熵检测 (Entropy Test)
+    // 3. Entropy Test
     auto calcEntropy = [&](const string& s) -> double {
         map<char, int> freqs;
         for (char c : s) freqs[c]++;
@@ -1483,9 +1483,9 @@ void doGlobalComparisonWithArgs(string origFile, string secretMsg, bool debugMod
     struct SchemeResult {
         string category;
         string name;
-        double bpw;        // 【学术修正 1】理论极限容量
-        double klDiv_mean; // 一阶 KL 散度均值
-        double klDiv_ci;   // KL 散度置信区间
+        double bpw;        // 【Academic Correction 1】Theoretical Limit Capacity
+        double klDiv_mean; // First-order KL divergence mean
+        double klDiv_ci;   // KL divergence confidence interval
         double tokenKl_mean;
         double tokenKl_ci;
         double tokenBigramKl_mean;
@@ -1496,17 +1496,17 @@ void doGlobalComparisonWithArgs(string origFile, string secretMsg, bool debugMod
         double markov_ci;
         double entropy_mean;
         double entropy_ci;
-        double timeMsKb;   // 计算复杂度
-        double rob_l2_mean;// L2 鲁棒性均值
-        double rob_l2_ci;  // L2 鲁棒性置信区间
-        double rob_l3_mean;// L3 鲁棒性均值
-        double rob_l3_ci;  // L3 鲁棒性置信区间
+        double timeMsKb;   // computational complexity
+        double rob_l2_mean;// L2 robustness mean
+        double rob_l2_ci;  // L2 robustness confidence interval
+        double rob_l3_mean;// L3 robustness mean
+        double rob_l3_ci;  // L3 robustness confidence interval
         string samplePath;
         DetectReport detect;
     };
     vector<SchemeResult> results;
 
-    // 通用学术测试框架 (使用 std::function 以解决 lambda 泛型推导问题)
+    // General academic testing framework (using std::function to solve lambda generic derivation problems)
     auto run_academic_benchmark = [&](
         string cat, 
         string name, 
@@ -1517,9 +1517,9 @@ void doGlobalComparisonWithArgs(string origFile, string secretMsg, bool debugMod
         SchemeResult r;
         r.category = cat; r.name = name;
         
-        if (debugMode) cout << "\n[Debug] 开始测试方案: " << name << endl;
+        if (debugMode) cout << "\n[Debug] Start test plan:" << name << endl;
 
-        // 【学术修正 1】计算理论极限容量 (Theoretical Capacity)
+        // [Academic Correction 1] Calculate theoretical limit capacity (Theoretical Capacity)
         int max_capacity = cap_func(origStr);
         r.bpw = (double)max_capacity / wordCount;
 
@@ -1555,7 +1555,7 @@ void doGlobalComparisonWithArgs(string origFile, string secretMsg, bool debugMod
             markov_vals[iter] = calcMarkovShift(origStr, stego_str);
             ent_vals[iter] = abs(calcEntropy(origStr) - calcEntropy(stego_str));
 
-            // 【学术修正 4】多等级攻击鲁棒性测试
+            // [Academic Modification 4] Multi-level attack robustness test
             auto test_robustness = [&](const string& attacked_str) -> double {
                 vector<int> extracted = extract_func(attacked_str, embedded);
                 int matches = 0; int check_len = min((int)extracted.size(), embedded);
@@ -1641,31 +1641,31 @@ void doGlobalComparisonWithArgs(string origFile, string secretMsg, bool debugMod
         r.detect = detect_all(origStr, stego_first);
 
         results.push_back(r);
-        cout << ">> 已完成测试: " << r.name << " (单次嵌入 " << embedded_sample << "/" << secretBitsCount << " bits, " << ITERATIONS << " 次实验)" << endl;
+        cout << ">> Test completed:" << r.name << "(Single embed" << embedded_sample << "/" << secretBitsCount << " bits, " << ITERATIONS << "experiments)" << endl;
     };
 
-    // --- 1. 格式化隐写 ---
-    run_academic_benchmark("1. 格式化隐写 (Format-based)", "空格歧义编码 (Whitespace Modulation) [本方案]", embed_ws, extract_ws, max_capacity_ws);
-    run_academic_benchmark("1. 格式化隐写 (Format-based)", "不可见字符嵌入 (Zero-Width Characters)", embed_zwc, extract_zwc, max_capacity_zwc);
-    run_academic_benchmark("1. 格式化隐写 (Format-based)", "字体特征微调 (Font-based Manipulation)", embed_font, extract_font, max_capacity_font);
+    // --- 1. Formatted steganography ---
+    run_academic_benchmark("1. Format-based steganography", "Whitespace Modulation [This plan]", embed_ws, extract_ws, max_capacity_ws);
+    run_academic_benchmark("1. Format-based steganography", "Invisible character embedding (Zero-Width Characters)", embed_zwc, extract_zwc, max_capacity_zwc);
+    run_academic_benchmark("1. Format-based steganography", "Font-based Manipulation", embed_font, extract_font, max_capacity_font);
 
-    // --- 2. 语言学隐写 ---
-    run_academic_benchmark("2. 语言学隐写 (Linguistic)", "同义词替换 (Synonym Substitution)", embed_syn, extract_syn, max_capacity_syn);
-    run_academic_benchmark("2. 语言学隐写 (Linguistic)", "句法转换 (Syntactic Transformation)", embed_syn_trans, extract_syn_trans, max_capacity_syn_trans);
-    run_academic_benchmark("2. 语言学隐写 (Linguistic)", "拼写与缩写变体 (Abbreviation & Spelling)", embed_abbr, extract_abbr, max_capacity_abbr);
+    // --- 2. Linguistic steganography ---
+    run_academic_benchmark("2. Linguistic", "Synonym Substitution", embed_syn, extract_syn, max_capacity_syn);
+    run_academic_benchmark("2. Linguistic", "Syntactic Transformation", embed_syn_trans, extract_syn_trans, max_capacity_syn_trans);
+    run_academic_benchmark("2. Linguistic", "Abbreviation & Spelling", embed_abbr, extract_abbr, max_capacity_abbr);
 
-    // --- 3. 生成式隐写 ---
-    run_academic_benchmark("3. 生成式隐写 (Generative)", "马尔可夫链生成 (Markov Chain Generation)", embed_markov, extract_markov, max_capacity_gen);
-    run_academic_benchmark("3. 生成式隐写 (Generative)", "神经概率分布编码 (LLM-based Encoding)", embed_llm, extract_llm, max_capacity_gen_llm);
+    // --- 3. Generative steganography ---
+    run_academic_benchmark("3. Generative steganography (Generative)", "Markov Chain Generation", embed_markov, extract_markov, max_capacity_gen);
+    run_academic_benchmark("3. Generative steganography (Generative)", "Neural probability distribution encoding (LLM-based Encoding)", embed_llm, extract_llm, max_capacity_gen_llm);
 
-    // --- 4. 结构化与协议隐写 ---
-    run_academic_benchmark("4. 结构化与协议隐写 (Structural & Protocol-based)", "协议补白 (Padding)", embed_pad, extract_pad, max_capacity_pad);
-    run_academic_benchmark("4. 结构化与协议隐写 (Structural & Protocol-based)", "特定布局编码 (Layout/Acrostic)", embed_layout, extract_layout, max_capacity_layout);
-    run_academic_benchmark("4. 结构化与协议隐写 (Structural & Protocol-based)", "字段顺序扰动 (Field Ordering)", embed_field, extract_field, max_capacity_field);
+    // --- 4. Structuring and protocol steganography ---
+    run_academic_benchmark("4. Structural & Protocol-based", "Protocol Padding", embed_pad, extract_pad, max_capacity_pad);
+    run_academic_benchmark("4. Structural & Protocol-based", "Layout-specific encoding (Layout/Acrostic)", embed_layout, extract_layout, max_capacity_layout);
+    run_academic_benchmark("4. Structural & Protocol-based", "Field Ordering", embed_field, extract_field, max_capacity_field);
 
-    // --- 输出最终对比结果 ---
+    // --- Output the final comparison results ---
     cout << "\n=========================================================================================" << endl;
-    cout << "最终学术级基准测试指标输出 (Academic Metrics Output)" << endl;
+    cout << "Final Academic Metrics Output" << endl;
     cout << "=========================================================================================" << endl;
     
     string currentCat = "";
@@ -1675,34 +1675,34 @@ void doGlobalComparisonWithArgs(string origFile, string secretMsg, bool debugMod
             cout << "\n\033[1;32m" << currentCat << "\033[0m" << endl;
         }
         
-        cout << "▶ 方案: " << res.name << endl;
+        cout << "▶ Solution:" << res.name << endl;
         cout << fixed << setprecision(4);
-        cout << "   - 理论最大载体容量 (Theoretical BPW): " << setw(10) << res.bpw << " bits/word" << endl;
+        cout << "- Theoretical maximum carrier capacity (Theoretical BPW):" << setw(10) << res.bpw << " bits/word" << endl;
         cout << scientific << setprecision(6);
-        cout << "   - 字节分布 KL:                        " << res.klDiv_mean << " ± " << res.klDiv_ci << " (越低越自然)" << endl;
-        cout << "   - 词分布 KL:                          " << res.tokenKl_mean << " ± " << res.tokenKl_ci << " (语言学更敏感)" << endl;
-        cout << "   - 词二元组 KL:                        " << res.tokenBigramKl_mean << " ± " << res.tokenBigramKl_ci << " (顺序更敏感)" << endl;
+        cout << "- Byte distribution KL:" << res.klDiv_mean << " ± " << res.klDiv_ci << "(The lower the more natural)" << endl;
+        cout << "- Word distribution KL:" << res.tokenKl_mean << " ± " << res.tokenKl_ci << "(Linguistics are more sensitive)" << endl;
+        cout << "- word bigram KL:" << res.tokenBigramKl_mean << " ± " << res.tokenBigramKl_ci << "(More order sensitive)" << endl;
         cout << fixed << setprecision(4);
-        cout << "   - 二阶连续特征偏移 (Markov Shift):    " << setw(10) << res.markovShift << " (反映结构异常)" << endl;
-        cout << "   - 文本信息熵差 (Entropy Diff):        " << setw(10) << res.entropyDiff << " (隐写前后变化)" << endl;
-        cout << "   - 算法计算复杂度:                     " << setw(10) << res.timeMsKb << " ms/KB" << endl;
-        cout << "   - 鲁棒性(L2-常见噪声处理/格式清洗):   " << setw(10) << res.rob_l2_mean << " ± " << res.rob_l2_ci << " %" << endl;
-        cout << "   - 鲁棒性(L3-语义改写/同义词回退):     " << setw(10) << res.rob_l3_mean << " ± " << res.rob_l3_ci << " %" << endl;
-        cout << "   - 样本文本输出路径:                   " << res.samplePath << endl;
-        cout << "   - 检测(ZWC扫描):                      " << (res.detect.det_zwc ? "DETECTED" : "OK") << " (count=" << res.detect.zwc_count << ")" << endl;
-        cout << "   - 检测(富文本标签):                   " << (res.detect.det_markup ? "DETECTED" : "OK") << " (count=" << res.detect.markup_count << ")" << endl;
-        cout << "   - 检测(同形字/Unicode):               " << (res.detect.det_homoglyph ? "DETECTED" : "OK") << " (count=" << res.detect.homoglyph_count << ")" << endl;
-        cout << "   - 检测(尾随空白):                     " << (res.detect.det_trailing ? "DETECTED" : "OK") << " (lines=" << res.detect.ws.trailing_space_lines << ")" << endl;
-        cout << "   - 检测(空白统计):                     " << (res.detect.det_ws_stats ? "DETECTED" : "OK") << " (dblRatio=" << res.detect.ws.double_space_ratio << ", maxRun=" << res.detect.ws.max_space_run << ")" << endl;
-        cout << "   - 检测(语言模型CE):                   " << (res.detect.det_lm ? "DETECTED" : "OK") << " (CE=" << res.detect.lm_ce << ", Δ=" << res.detect.lm_ce_delta << ")" << endl;
+        cout << "- Second-order continuous feature shift (Markov Shift):" << setw(10) << res.markovShift << "(Reflecting structural anomalies)" << endl;
+        cout << "- Text information entropy difference (Entropy Diff):" << setw(10) << res.entropyDiff << "(changes before and after steganography)" << endl;
+        cout << "- Algorithm computational complexity:" << setw(10) << res.timeMsKb << " ms/KB" << endl;
+        cout << "- Robustness (L2-common noise processing/format cleaning):" << setw(10) << res.rob_l2_mean << " ± " << res.rob_l2_ci << " %" << endl;
+        cout << "- Robustness (L3-semantic rewriting/synonym fallback):" << setw(10) << res.rob_l3_mean << " ± " << res.rob_l3_ci << " %" << endl;
+        cout << "- Sample text output path:" << res.samplePath << endl;
+        cout << "- Detection (ZWC scan):" << (res.detect.det_zwc ? "DETECTED" : "OK") << " (count=" << res.detect.zwc_count << ")" << endl;
+        cout << "- Detection (rich text tags):" << (res.detect.det_markup ? "DETECTED" : "OK") << " (count=" << res.detect.markup_count << ")" << endl;
+        cout << "- Detection (Homographs/Unicode):" << (res.detect.det_homoglyph ? "DETECTED" : "OK") << " (count=" << res.detect.homoglyph_count << ")" << endl;
+        cout << "- Detection (trailing whitespace):" << (res.detect.det_trailing ? "DETECTED" : "OK") << " (lines=" << res.detect.ws.trailing_space_lines << ")" << endl;
+        cout << "- Detection (blank statistics):" << (res.detect.det_ws_stats ? "DETECTED" : "OK") << " (dblRatio=" << res.detect.ws.double_space_ratio << ", maxRun=" << res.detect.ws.max_space_run << ")" << endl;
+        cout << "- Detection (Language Model CE):" << (res.detect.det_lm ? "DETECTED" : "OK") << " (CE=" << res.detect.lm_ce << ", Δ=" << res.detect.lm_ce_delta << ")" << endl;
         cout << "-----------------------------------------------------------------------------------------" << endl;
     }
     
-    cout << "\n[学术级基准测试核心结论]" << endl;
-    cout << "\033[1;32m1. 本方案（空格歧义编码） 在【KL散度】和【计算复杂度】上具有绝对优势。\033[0m\n";
-    cout << "\033[1;32m   虽然在二阶连续特征 (Markov Shift) 上存在轻微偏移（由于双空格的引入），但在日志这种天然包含大量对齐空格的场景中，此偏移具备极强的隐蔽合理性。\033[0m\n";
-    cout << "2. 语言学隐写（如句法、同义词）的理论容量 (Theoretical BPW) 极低，且在面临 L3 级语义改写攻击时，鲁棒性迅速下降。" << endl;
-    cout << "3. LLM 编码虽然在生成质量上优秀，但在面临原文本比对时会产生巨大的 KL 散度和 Markov Shift，且推断时间成本极高，无法落地于高频场景。" << endl;
+    cout << "\n[Academic-level benchmark core conclusion]" << endl;
+    cout << "\033[1;32m1. This solution (space ambiguity encoding) has absolute advantages in [KL divergence] and [computational complexity]. \033[0m\n";
+    cout << "\033[1;32m Although there is a slight offset on the second-order continuous feature (Markov Shift) (due to the introduction of double spaces), in a scenario such as logs that naturally contains a large number of aligned spaces, this offset has a strong hidden rationality. \033[0m\n";
+    cout << "2. The theoretical capacity (Theoretical BPW) of linguistic steganography (such as syntax, synonyms) is extremely low, and its robustness decreases rapidly when faced with L3-level semantic rewriting attacks." << endl;
+    cout << "3. Although LLM coding is excellent in terms of generation quality, it will produce huge KL divergence and Markov Shift when faced with original text comparison, and the inference time cost is extremely high, making it unable to be implemented in high-frequency scenarios." << endl;
     cout << "=========================================================================================\n" << endl;
 
     ofstream sumCsv(summaryCsvPath, ios::binary);
@@ -1753,26 +1753,26 @@ void doGlobalComparisonWithArgs(string origFile, string secretMsg, bool debugMod
         }
     }
 
-    cout << "CSV 已输出: " << perIterCsvPath << endl;
-    cout << "CSV 已输出: " << summaryCsvPath << endl;
+    cout << "CSV output:" << perIterCsvPath << endl;
+    cout << "CSV output:" << summaryCsvPath << endl;
 }
 
 void doGlobalComparison() {
     bool debugMode = false;
     string debugInput;
-    cout << "是否开启 Debug 模式输出详细变量与计算逻辑？(y/n, 默认为 n): ";
+    cout << "Whether to enable Debug mode to output detailed variables and calculation logic? (y/n, default is n):";
     getline(cin, debugInput);
     if (debugInput == "y" || debugInput == "Y") {
         debugMode = true;
     }
 
     string origFile;
-    cout << "请输入用于基准测试的日志文件路径 (默认为 log.txt): ";
+    cout << "Please enter the path to the log file used for benchmarking (default is log.txt):";
     getline(cin, origFile);
     if (origFile.empty()) origFile = "log.txt";
 
     string secretMsg;
-    cout << "请输入要让所有方案隐藏的同一条信息 (默认为 Hidewriteforlog): ";
+    cout << "Please enter the same message to be hidden for all scenarios (default is Hidewriteforlog):";
     getline(cin, secretMsg);
     if (secretMsg.empty()) secretMsg = "Hidewriteforlog";
 

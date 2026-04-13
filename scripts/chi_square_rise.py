@@ -12,14 +12,14 @@ plot_df = df.iloc[::20, :]
 
 fig, ax = plt.subplots(figsize=(8, 5), dpi=120)
 
-# 仅绘制 Chi-Square
+# Draw Chi-Square only
 ax.plot(plot_df['Size_KB'], plot_df['Chi_Square'], color='#1f77b4', 
         marker='o', markersize=5, linewidth=1.5,
         markerfacecolor='white', markeredgewidth=1.5, label='Chi-Square Statistic')
 
-# 美化设置
+# landscaping settings
 ax.set_xscale('log')
-ax.set_yscale('log') # 这种增长趋势用双对数坐标看最显“线性”，显专业
+ax.set_yscale('log') # This growth trend is most "linear" and professional when viewed using logarithmic coordinates.
 ax.set_xlabel('Log Window Size (KB)', fontsize=12, fontweight='bold')
 ax.set_ylabel('Chi-Square Value', fontsize=12, fontweight='bold')
 

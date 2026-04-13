@@ -8,19 +8,19 @@ matplotlib.rcParams['pdf.fonttype'] = 42
 sns.set_theme(style="darkgrid", rc={"axes.facecolor": "#EAEAF2", "font.family": "serif"})
 
 df = pd.read_csv('chi_square_plot_data.csv')
-# 为了突出隐身性，我们只展示到 P 值开始明显波动的区域，或者全量展示但去除干扰
+# In order to highlight the invisibility, we only display the area where the P value begins to fluctuate significantly, or display it in full but remove the interference
 plot_df = df.iloc[::20, :] 
 
 fig, ax = plt.subplots(figsize=(8, 5), dpi=120)
 
-# 仅绘制 P-Value
+# Plot only P-Value
 ax.plot(plot_df['Size_KB'], plot_df['p_value'], color='#2ca02c', 
         linewidth=2.5, marker='s', markersize=4, markevery=50,
         markerfacecolor='white', label='P-Value (Detection Significance)')
 
 ax.axhline(y=0.05, color='r', linestyle='--', alpha=0.6, label='Significance Level (0.05)')
 
-# 美化设置
+# landscaping settings
 ax.set_xscale('log')
 ax.set_xlabel('Log Window Size (KB)', fontsize=12, fontweight='bold')
 ax.set_ylabel('P-Value', fontsize=12, fontweight='bold')

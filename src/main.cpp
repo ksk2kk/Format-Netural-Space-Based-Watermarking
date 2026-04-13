@@ -9,13 +9,13 @@
 
 using namespace std;
 
-// 辅助函数：将字符串转换为二进制位流 (8 bits per char)
+// Helper function: Convert string to binary bit stream (8 bits per char)
 vector<int> stringToBits(const string& input) {
     vector<int> bits;
     for (char c : input) {
         bitset<8> b(c);
-        // bitset[0]是最低位，bitset[7]是最高位
-        // 我们按高位在前的顺序存储，方便阅读和处理
+        // bitset[0] is the lowest bit, bitset[7] is the highest bit
+        // We store them in high-order order to facilitate reading and processing.
         for (int i = 7; i >= 0; --i) {
             bits.push_back(b[i]);
         }
@@ -23,7 +23,7 @@ vector<int> stringToBits(const string& input) {
     return bits;
 }
 
-// 辅助函数：将二进制位流还原为字符串
+// Helper function: restore binary bit stream to string
 string bitsToString(const vector<int>& bits) {
     string result = "";
     for (size_t i = 0; i + 7 < bits.size(); i += 8) {
@@ -36,7 +36,7 @@ string bitsToString(const vector<int>& bits) {
     return result;
 }
 
-// 辅助函数：读取整个文件到内存buffer
+// Auxiliary function: read the entire file into the memory buffer
 vector<char> readFile(const string& filename) {
     ifstream file(filename, ios::binary);
     if (!file) {
@@ -54,7 +54,7 @@ vector<char> readFile(const string& filename) {
     return {};
 }
 
-// 辅助函数：写回文件
+// Helper function: write back to file
 void writeFile(const string& filename, const vector<char>& buffer) {
     ofstream file(filename, ios::binary);
     if (!file) {
@@ -64,7 +64,7 @@ void writeFile(const string& filename, const vector<char>& buffer) {
     file.write(buffer.data(), buffer.size());
 }
 
-// 辅助函数：统计文件中的可用空格槽位
+// Helper function: Statistics of available space slots in the file
 size_t countSpaceSlots(const vector<char>& content) {
     size_t count = 0;
     for (size_t i = 0; i < content.size(); ++i) {
@@ -82,7 +82,7 @@ size_t countSpaceSlots(const vector<char>& content) {
 
 void doHideWrite() {
     string filename;
-    cout << "请输入日志文件名 (默认为 log.txt): ";
+    cout << "Please enter a log file name (default is log.txt):";
     if (cin.peek() == '\n') cin.ignore();
     getline(cin, filename);
     if (!filename.empty() && filename.back() == '\r') filename.pop_back();
@@ -91,27 +91,27 @@ void doHideWrite() {
     vector<char> fileContent = readFile(filename);
     if (fileContent.empty()) return;
 
-    // 自动探测文件大小和容量
+    // Automatically detect file size and capacity
     double fileSizeKB = fileContent.size() / 1024.0;
     size_t totalSlots = countSpaceSlots(fileContent);
     size_t maxChars = totalSlots / 8;
 
-    cout << "文件大小: " << fixed << setprecision(2) << fileSizeKB << " KB" << endl;
-    cout << "可用空格槽位: " << totalSlots << endl;
-    cout << "理论最大隐写字符数: " << maxChars << " (每KB可存约 " << (fileSizeKB > 0 ? maxChars / fileSizeKB : 0) << " 字符)" << endl;
+    cout << "File size:" << fixed << setprecision(2) << fileSizeKB << " KB" << endl;
+    cout << "Available space slots:" << totalSlots << endl;
+    cout << "Theoretical maximum number of steganographic characters:" << maxChars << "(Each KB can be reserved" << (fileSizeKB > 0 ? maxChars / fileSizeKB : 0) << "character)" << endl;
 
     string secretMsg;
-    cout << "请输入要隐写的字符串: ";
+    cout << "Please enter the string to be hidden:";
     getline(cin, secretMsg);
     if (!secretMsg.empty() && secretMsg.back() == '\r') secretMsg.pop_back();
 
     auto startTime = chrono::high_resolution_clock::now();
 
-    // 1. 转换隐写信息为 bit 流
+    // 1. Convert steganographic information into bit stream
     vector<int> bits = stringToBits(secretMsg);
     
-    // 2. 计算可重复隐写的次数
-    // 每次隐写消耗的槽位 = bits.size() + 1 (终止符)
+    // 2. Calculate the number of times steganography can be repeated
+    // Slots consumed for each steganography = bits.size() + 1 (terminator)
     size_t slotsPerMsg = bits.size() + 1;
     size_t repeatCount = 0;
     
@@ -120,20 +120,20 @@ void doHideWrite() {
     }
     
     if (repeatCount == 0) {
-        cout << "警告：文件空间不足，无法完整写入一次信息！将尽可能写入。" << endl;
+        cout << "Warning: Insufficient file space to completely write information once! Will write as much as possible." << endl;
     } else {
-        cout << "文件空间充足，将重复隐写 " << repeatCount << " 次。" << endl;
+        cout << "The file space is sufficient and duplicate steganography will be performed" << repeatCount << "Second-rate." << endl;
     }
 
-    // 3. 开始隐写
-    // 策略：
-    // bit 0 -> 1个空格
-    // bit 1 -> 2个空格
-    // 结束符 -> 3个空格
+    // 3. Start steganography
+    // Strategy:
+    // bit 0 -> 1 space
+    // bit 1 -> 2 spaces
+    // Terminator -> 3 spaces
     
     vector<char> newContent;
     size_t currentSlotIndex = 0;
-    size_t writtenCount = 0; // 记录已完整写入的次数
+    size_t writtenCount = 0; // Record the number of complete writes
     
     for (size_t i = 0; i < fileContent.size(); ++i) {
         if (fileContent[i] != 0x20) {
@@ -141,37 +141,37 @@ void doHideWrite() {
             continue;
         }
 
-        // 找到一个空格槽位
+        // Find a space slot
         size_t j = i + 1;
         while (j < fileContent.size() && fileContent[j] == 0x20) {
             j++;
         }
         
-        // 决定要写入多少个空格
-        int spacesNeeded = 1; // 默认归一化为1个空格
+        // Decide how many spaces to write
+        int spacesNeeded = 1; // Normalized to 1 space by default
 
         if (slotsPerMsg > 0) {
-            // 计算当前槽位对应消息中的哪个位置
-            // 我们不限制 repeatCount，只要有空间就一直写，直到文件结束
-            // 这样能保证利用所有槽位
+            // Calculate which position in the message the current slot corresponds to
+            // We do not limit repeatCount and keep writing as long as there is space until the end of the file.
+            // This ensures that all slots are used
             size_t msgIndex = currentSlotIndex % slotsPerMsg;
             
             if (msgIndex < bits.size()) {
-                // 写入数据位
+                // Write data bits
                 if (bits[msgIndex] == 0) spacesNeeded = 1;
                 else spacesNeeded = 2;
             } else {
-                // 写入终止符
+                // write terminator
                 spacesNeeded = 3;
-                // 如果这是终止符，说明完成了一次完整写入（仅用于统计）
-                // 但我们在循环结束时统计更准确，或者在这里累加
+                // If this is the terminator, a complete write is completed (for statistics only)
+                // But it's more accurate if we count at the end of the loop, or add up here
                 if ((currentSlotIndex + 1) % slotsPerMsg == 0) {
                     writtenCount++;
                 }
             }
             currentSlotIndex++;
         } else {
-            // 如果没有信息（比如空字符串），保持默认1个空格
+            // If there is no information (such as an empty string), keep the default of 1 space
             spacesNeeded = 1;
         }
 
@@ -179,38 +179,38 @@ void doHideWrite() {
             newContent.push_back(0x20);
         }
 
-        i = j - 1; // 跳过原文件中的连续空格
+        i = j - 1; // Skip consecutive spaces in the original file
     }
 
     auto endTime = chrono::high_resolution_clock::now();
     auto duration = chrono::duration_cast<chrono::milliseconds>(endTime - startTime).count();
 
-    // 4. 写回文件
+    // 4. Write back the file
     writeFile(filename, newContent);
 
-    // 5. 统计信息
-    cout << "隐写完成！" << endl;
-    cout << "用时: " << duration << " ms" << endl;
-    cout << "信息长度: " << secretMsg.length() << " 字符" << endl;
-    cout << "实际完整隐写次数: " << writtenCount << endl;
+    // 5. Statistics
+    cout << "Steganography completed!" << endl;
+    cout << "Usage:" << duration << " ms" << endl;
+    cout << "Message length:" << secretMsg.length() << "character" << endl;
+    cout << "Actual number of complete steganography:" << writtenCount << endl;
     
-    // 计算总隐写字符数 (包含重复)
+    // Calculate the total number of stego characters (including repetitions)
     size_t totalWrittenChars = writtenCount * secretMsg.length();
-    // 加上最后一次可能未写完的部分
+    // Plus the parts that may have been left unfinished the last time
     size_t remainderSlots = currentSlotIndex % slotsPerMsg;
     if (remainderSlots > 0) {
-        // 每8个槽位是一个字符
+        // Every 8 slots is one character
         totalWrittenChars += remainderSlots / 8;
     }
     
-    cout << "总隐写字符数: " << totalWrittenChars << endl;
+    cout << "Total number of stego characters:" << totalWrittenChars << endl;
     double speed = (duration > 0) ? (totalWrittenChars * 1000.0 / duration) : 0;
-    cout << "隐写效率: " << fixed << setprecision(2) << speed << " 字符/秒" << endl;
+    cout << "Steganography efficiency:" << fixed << setprecision(2) << speed << "characters/second" << endl;
 }
 
 void doRestore() {
     string filename;
-    cout << "请输入日志文件名 (默认为 log.txt): ";
+    cout << "Please enter a log file name (default is log.txt):";
     if (cin.peek() == '\n') cin.ignore();
     getline(cin, filename);
     if (!filename.empty() && filename.back() == '\r') filename.pop_back();
@@ -235,13 +235,13 @@ void doRestore() {
                 j++;
             }
             
-            // 解析槽位
+            // parse slot
             if (count == 1) {
                 currentBits.push_back(0);
             } else if (count == 2) {
                 currentBits.push_back(1);
             } else if (count >= 3) {
-                // 遇到终止符
+                // Terminator encountered
                 foundTerminator = true;
                 terminatorCount++;
                 if (!currentBits.empty()) {
@@ -254,7 +254,7 @@ void doRestore() {
         }
     }
     
-    // 检查最后一段是否还有数据
+    // Check if there is still data in the last paragraph
     if (!currentBits.empty()) {
         messages.push_back(bitsToString(currentBits) + " [Incomplete]");
     }
@@ -262,19 +262,19 @@ void doRestore() {
     auto endTime = chrono::high_resolution_clock::now();
     auto duration = chrono::duration_cast<chrono::milliseconds>(endTime - startTime).count();
 
-    cout << "还原完成！" << endl;
-    cout << "检测到终止符次数: " << terminatorCount << endl;
-    cout << "还原出的信息片段数量: " << messages.size() << endl;
+    cout << "Restore completed!" << endl;
+    cout << "Number of terminators detected:" << terminatorCount << endl;
+    cout << "Number of information fragments restored:" << messages.size() << endl;
     
     if (messages.empty()) {
-        cout << "未找到有效信息。" << endl;
+        cout << "No valid information found." << endl;
     } else {
-        cout << "第一条完整信息: [" << messages[0] << "]" << endl;
+        cout << "The first complete message: [" << messages[0] << "]" << endl;
         if (messages.size() > 1) {
-             // 检查是否所有信息都相同
+             // Check if all information is the same
              bool allSame = true;
              for(size_t k=1; k<messages.size(); ++k) {
-                 // 忽略最后可能的不完整标记
+                 // Ignore last possible incomplete token
                  string s1 = messages[0];
                  string s2 = messages[k];
                  if (s2.find("[Incomplete]") != string::npos) continue;
@@ -284,24 +284,24 @@ void doRestore() {
                  }
              }
              if (allSame) {
-                 cout << "所有完整片段内容一致 (共 " << (currentBits.empty() ? messages.size() : messages.size()-1) << " 次重复)" << endl;
+                 cout << "All complete segments have the same content (total" << (currentBits.empty() ? messages.size() : messages.size()-1) << "times repeated)" << endl;
              } else {
-                 cout << "注意：还原出的片段内容不完全一致！" << endl;
+                 cout << "Note: The content of the restored fragments is not completely consistent!" << endl;
                  for(size_t k=0; k<messages.size(); ++k) {
-                     cout << "片段 " << k+1 << ": " << messages[k] << endl;
+                     cout << "fragment" << k+1 << ": " << messages[k] << endl;
                  }
              }
         }
     }
 
-    cout << "用时: " << duration << " ms" << endl;
+    cout << "Usage:" << duration << " ms" << endl;
 }
 
 void getUserChoose() {
-    cout << "请选择功能:" << endl;
-    cout << "1. 隐写日志 (Hide)" << endl;
-    cout << "2. 还原日志 (Restore)" << endl;
-    cout << "输入选择 (1/2): ";
+    cout << "Please select function:" << endl;
+    cout << "1. Stegolog (Hide)" << endl;
+    cout << "2. Restore log (Restore)" << endl;
+    cout << "Input selection (1/2):";
     
     int choice;
     cin >> choice;
@@ -309,10 +309,10 @@ void getUserChoose() {
     if (cin.fail()) {
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        cout << "无效输入" << endl;
+        cout << "Invalid input" << endl;
         return;
     }
-    // 吃掉回车
+    // Eat Enter
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
     if (choice == 1) {
@@ -320,12 +320,12 @@ void getUserChoose() {
     } else if (choice == 2) {
         doRestore();
     } else {
-        cout << "无效输入" << endl;
+        cout << "Invalid input" << endl;
     }
 }
 
 int main() {
-    // 设置控制台编码，防止乱码 (Windows)
+    // Set console encoding to prevent garbled characters (Windows)
     system("chcp 65001 > nul");
     
     while(true) {

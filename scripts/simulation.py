@@ -291,7 +291,7 @@ def main():
     # Check for Geth startup success (brief wait)
     time.sleep(2)
     if geth_process.poll() is None:
-        print("\n[System] Geth 启动成功 (Started Successfully)!\n")
+        print("\n[System] Geth Started Successfully!\n")
     else:
         print("\n[Error] Geth failed to start immediately.\n")
 
