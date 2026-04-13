@@ -213,19 +213,6 @@ run_academic_benchmark("Category Name", "Your Algorithm Name", embed_custom, ext
 
 ---
 
-## 📝 Citation
-
-If you use this framework in your academic research, please cite our paper:
-
-```bibtex
-@article{LogStego2026,
-  title={Evaluating Log-based Steganography: A Comprehensive Benchmark Framework},
-  author={[Your Name / Authors]},
-  journal={[Target Journal / Conference]},
-  year={2026},
-  publisher={[Publisher]}
-}
-```
 
 ---
 
