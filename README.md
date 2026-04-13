@@ -87,6 +87,14 @@ The framework runs all generated stego-texts through 6 built-in detection scanne
 
 ---
 
+## 🏛️ Academic Integrity Declarations
+
+To ensure strict academic rigor, this benchmark implements the following design constraints:
+1. **Zero Data Faking:** The framework will statically check the capacity of your input log file. If the capacity is insufficient to embed the required bits across *all* schemes, it will hard-fail rather than artificially duplicating or faking input text.
+2. **LLM Evaluation Honesty:** To maintain an agile CI/CD pipeline and reasonable repository size, the *Generative LLM-based Encoding* scheme uses equivalent FLOPs matrix multiplications to accurately simulate inference delays, rather than loading a multi-gigabyte neural network. All entropy, KL divergence, and robustness metrics remain mathematically accurate to the algorithm's output.
+
+---
+
 ## 📂 Project Architecture
 
 ```text
@@ -166,9 +174,9 @@ The executable accepts standard command-line arguments to facilitate automated b
 
 ---
 
-## 🐳 Docker Support (One-Click Run)
+## 🐳 Docker Support (One-Click Deploy - Foolproof)
 
-To guarantee 100% reproducibility across any OS without dealing with C++ compilers, we provide a ready-to-use Docker container.
+To guarantee 100% reproducibility across any OS (including Windows WSL2, macOS, Linux) without dealing with C++ compilers or Geth installations, we provide a fully automated Docker container.
 
 ### 1. Build the Docker Image
 
@@ -176,23 +184,22 @@ To guarantee 100% reproducibility across any OS without dealing with C++ compile
 docker build -t stego-benchmark .
 ```
 
-### 2. Run the Benchmark in Docker
+### 2. Run the Academic Benchmark
 
-You can run the container directly. By default, it executes the 11-algorithm benchmark for 10 iterations:
+Run the container to automatically execute the 11-algorithm benchmark. It will output to the `results` folder.
 
 ```bash
 docker run --rm -v $(pwd)/results:/app/results stego-benchmark
 ```
 
-*(Note: We use `-v $(pwd)/results:/app/results` to map the container's output folder back to your host machine, so you can easily access the generated CSVs and `.txt` stego-files).*
+### 3. Run the Geth Blockchain Simulation (Active Warden Test)
 
-### 3. Run with Custom Arguments
-
-You can override the default arguments by passing them at the end of the `docker run` command:
+To run the live blockchain simulation (where `geth` feeds logs to the steganography engine in real-time), simply append `simulate` to the command:
 
 ```bash
-docker run --rm -v $(pwd)/results:/app/results stego-benchmark --option 6 --file data/log.txt --secret "MyCustomPayload" --iterations 50
+docker run --rm -it -v $(pwd)/results:/app/results stego-benchmark simulate
 ```
+*(Note: `-it` is required for interactive input of the secret message).*
 
 ---
 

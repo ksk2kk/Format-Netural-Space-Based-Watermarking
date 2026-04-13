@@ -7,15 +7,21 @@ import json
 import shutil
 import re
 import signal
+import platform
 
 # Configuration
 GENESIS_FILE = "genesis.json"
 DATA_DIR = "chain_data"
 PASSWORD_FILE = "password.txt"
-GETH_IPC = r"\\.\pipe\geth_simulation.ipc"
+GETH_IPC = r"\\.\pipe\geth_simulation.ipc" if platform.system() == "Windows" else "geth_simulation.ipc"
 CHAIN_ID = 12345
 # C++ Program Name
-CPP_EXE = "advanced_main.exe"
+if platform.system() == "Windows":
+    CPP_EXE = os.path.join("bin", "advanced_main.exe") if os.path.exists(os.path.join("bin", "advanced_main.exe")) else "advanced_main.exe"
+else:
+    CPP_EXE = os.path.join("bin", "advanced_main")
+    if not os.path.exists(CPP_EXE):
+        CPP_EXE = "./advanced_main"
 
 def cleanup_previous_run():
     """Removes previous data directories to ensure a clean start."""
@@ -271,7 +277,6 @@ def main():
         '--networkid', str(CHAIN_ID),
         '--nodiscover',
         '--mine',
-        '--miner.threads', '1',
         '--miner.etherbase', signer_address,
         '--unlock', signer_address,
         '--password', PASSWORD_FILE,
